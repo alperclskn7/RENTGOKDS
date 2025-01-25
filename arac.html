@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arac Listeleme</title>
+    <link rel="stylesheet" href="arac.css">
+</head>
+<body>
+   <header>
+       <h1>Şube Seçin ve Araçları Görüntüleyin</h1>
+       <div class="logout-icon" onclick="window.location.href='admin.html';">
+        <img src="log-out_10024145.png" alt="Çıkış" />
+    </div>
+   </header>
+   
+   
+    <label for="sube-select">Şube Seçin:</label>
+    <select id="sube-select">
+        <option value="">Şube Seçin</option>
+    </select>
+    
+    <button id="fetch-araclar">Araçları Görüntüle</button>
+
+    <h2>Araçlar</h2>
+    <table id="arac-table">
+        <thead>
+            <tr>
+                <th>Marka</th>
+                <th>Model</th>
+                <th>Segment</th>
+                <th>Vites</th>
+                <th>Kasa Tipi</th>
+                <th>Yakıt Tipi</th>
+            </tr>
+        </thead>
+        <tbody>
+        
+        </tbody>
+    </table>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const subeSelect = document.getElementById("sube-select");
+            const fetchButton = document.getElementById("fetch-araclar");
+            const aracTableBody = document.querySelector("#arac-table tbody");
+
+        
+            fetch('http://localhost:3000/branches')
+                .then(response => response.json())
+                .then(subeler => {
+                    subeler.forEach(sube => {
+                        const option = document.createElement("option");
+                        option.value = sube.id;
+                        option.textContent = sube.sube_adi;
+                        subeSelect.appendChild(option);
+                    });
+                })
+                .catch(err => console.error("Şubeler yüklenirken hata oluştu:", err));
+
+            
+            function loadBranchVehicles(branchId) {
+                
+                fetch('http://localhost:3000/filtered-vehicle-data', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ branchId })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    aracTableBody.innerHTML = ""; 
+                    if (data.vehicles && data.vehicles.length > 0) {
+                        data.vehicles.forEach(arac => {
+                            const row = document.createElement("tr");
+                            row.innerHTML = `
+                                <td>${arac.marka}</td>
+                                <td>${arac.model}</td>
+                                <td>${arac.segment}</td>
+                                <td>${arac.vites}</td>
+                                <td>${arac.kasa_tipi}</td>
+                                <td>${arac.yakit_tipi}</td>
+                            `;
+                            aracTableBody.appendChild(row);
+                        });
+                    } else {
+                        const row = document.createElement("tr");
+                        row.innerHTML = "<td colspan='6'>Bu şubeye ait araç bulunamadı.</td>";
+                        aracTableBody.appendChild(row);
+                    }
+                })
+                .catch(err => console.error("Araçlar yüklenirken hata oluştu:", err));
+            }
+
+            
+            fetchButton.addEventListener("click", () => {
+                const subeId = subeSelect.value;
+
+                if (!subeId) {
+                    alert("Lütfen bir şube seçiniz!");
+                    return;
+                }
+
+                loadBranchVehicles(subeId);
+            });
+        });
+    </script>
+</body>
+</html>

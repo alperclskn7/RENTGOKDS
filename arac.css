@@ -1,0 +1,154 @@
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f5f7fa;
+    color: #333;
+}
+
+
+header {
+    background-color: #ffffff; 
+    color: #333;
+    padding: 20px 0;
+    text-align: center;
+    border-bottom: 3px solid #001155; 
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+}
+
+header h1 {
+    margin: 0;
+    font-size: 2.5rem;
+    font-weight: 600;
+}
+
+
+h1 {
+    text-align: center;
+    color: #444;
+    margin-top: 20px;
+    font-size: 2rem;
+}
+
+h2 {
+    text-align: center;
+    color: #444;
+    font-size: 1.5rem;
+}
+
+
+label {
+    font-weight: bold;
+    margin: 10px;
+    font-size: 1rem;
+}
+
+select {
+    width: 250px;
+    padding: 12px;
+    margin: 10px 0;
+    font-size: 16px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #fff;
+    transition: border-color 0.3s ease;
+}
+
+select:focus {
+    border-color: #001155;
+    outline: none;
+}
+
+
+button {
+    padding: 10px 20px;
+    background-color: #001155;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #001155;
+}
+
+
+table {
+    width: 90%;
+    margin: 30px auto;
+    border-collapse: collapse;
+    background-color: #ffffff;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+th, td {
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+th {
+    background-color: #001155;
+    color: white;
+}
+
+td {
+    background-color: #f9f9f9;
+}
+
+td:hover {
+    background-color: #f1f1f1;
+}
+
+table th, table td {
+    font-size: 16px;
+}
+
+table tr:nth-child(even) td {
+    background-color: #f4f4f4;
+}
+
+table tr:hover td {
+    background-color: #e6f7ff;
+}
+
+
+@media (max-width: 768px) {
+    table {
+        width: 100%;
+        font-size: 14px;
+    }
+
+    select {
+        width: 100%;
+        font-size: 14px;
+    }
+
+    h1, h2 {
+        font-size: 18px;
+    }
+
+    button {
+        width: 100%;
+        padding: 12px;
+    }
+}
+
+.logout-icon {
+    position: absolute;
+    top: 2px;
+    right: 20px;
+    cursor: pointer;
+  }
+  
+  .logout-icon img {
+    width: 25px;
+    height: 25px;
+  }
+  

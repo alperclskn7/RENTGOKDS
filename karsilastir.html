@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Şube Karşılaştırma</title>
+    <link rel="stylesheet" href="karsilastir.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <header class="header">
+        <h1>Şube Karşılaştırma</h1>
+        <div class="logout-icon" onclick="window.location.href='admin.html';">
+        <img src="log-out_10024145.png" alt="Çıkış" />
+    </div>
+    </header>
+    <main class="main-content">
+        
+        <section class="filters">
+            <div class="filter-item">
+                <label for="branch1">Şube 1:</label>
+                <select id="branch1">
+                    
+                </select>
+            </div>
+            <div class="filter-item">
+                <label for="start-date1">Başlangıç Tarihi 1:</label>
+                <input type="date" id="start-date1" />
+            </div>
+            <div class="filter-item">
+                <label for="end-date1">Bitiş Tarihi 1:</label>
+                <input type="date" id="end-date1" />
+            </div>
+            <div class="filter-item">
+                <label for="branch2">Şube 2:</label>
+                <select id="branch2">
+                    
+                </select>
+            </div>
+            <div class="filter-item">
+                <label for="start-date2">Başlangıç Tarihi 2:</label>
+                <input type="date" id="start-date2" />
+            </div>
+            <div class="filter-item">
+                <label for="end-date2">Bitiş Tarihi 2:</label>
+                <input type="date" id="end-date2" />
+            </div>
+            <button id="apply-comparison">Karşılaştır</button>
+        </section>
+
+       
+        <section class="charts">
+            <h2>Performans Grafikleri</h2>
+            <div class="chart-row">
+                <div class="chart-container">
+                    <h3>Şube 1 - Segment Bazlı Kiralama Grafiği</h3>
+                    <canvas id="segment-chart-branch1"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h3>Şube 2 - Segment Bazlı Kiralama Grafiği</h3>
+                    <canvas id="segment-chart-branch2"></canvas>
+                </div>
+            </div>
+            <div class="chart-row">
+                <div class="chart-container">
+                    <h3>Şube 1 - Yakıt Türüne Göre Kiralama Grafiği</h3>
+                    <canvas id="fuel-chart-branch1"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h3>Şube 2 - Yakıt Türüne Göre Kiralama Grafiği</h3>
+                    <canvas id="fuel-chart-branch2"></canvas>
+                </div>
+            </div>
+            <div class="chart-row">
+                <div class="chart-container">
+                    <h3>Şube 1 - Şanzıman Türüne Göre Kiralama Grafiği</h3>
+                    <canvas id="transmission-chart-branch1"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h3>Şube 2 - Şanzıman Türüne Göre Kiralama Grafiği</h3>
+                    <canvas id="transmission-chart-branch2"></canvas>
+                </div>
+            </div>
+            <div class="chart-row">
+                <div class="chart-container">
+                    <h3>Şube 1 - Kasa Tipine Göre Kiralama Grafiği</h3>
+                    <canvas id="body-type-chart-branch1"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h3>Şube 2 - Kasa Tipine Göre Kiralama Grafiği</h3>
+                    <canvas id="body-type-chart-branch2"></canvas>
+                </div>
+            </div>
+        </section>
+    </main>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const branch1Select = document.getElementById("branch1");
+            const branch2Select = document.getElementById("branch2");
+            const startDate1Input = document.getElementById("start-date1");
+            const endDate1Input = document.getElementById("end-date1");
+            const startDate2Input = document.getElementById("start-date2");
+            const endDate2Input = document.getElementById("end-date2");
+            const compareButton = document.getElementById("apply-comparison");
+
+            let charts = {};
+
+            
+            fetch("http://localhost:3000/branches")
+                .then((response) => response.json())
+                .then((branches) => {
+                    branches.forEach((branch) => {
+                        const option1 = document.createElement("option");
+                        const option2 = document.createElement("option");
+                        option1.value = branch.id;
+                        option2.value = branch.id;
+                        option1.textContent = branch.sube_adi;
+                        option2.textContent = branch.sube_adi;
+                        branch1Select.appendChild(option1);
+                        branch2Select.appendChild(option2);
+                    });
+                })
+                .catch((error) => console.error("Şubeler yüklenirken hata oluştu:", error));
+
+            
+            compareButton.addEventListener("click", () => {
+                const branch1 = branch1Select.value;
+                const branch2 = branch2Select.value;
+                const startDate1 = startDate1Input.value;
+                const endDate1 = endDate1Input.value;
+                const startDate2 = startDate2Input.value;
+                const endDate2 = endDate2Input.value;
+
+                if (!branch1 || !branch2 || !startDate1 || !endDate1 || !startDate2 || !endDate2) {
+                    alert("Lütfen her iki şube ve tarih seçin.");
+                    return;
+                }
+
+                
+                fetchAndRenderCharts(branch1, startDate1, endDate1, "branch1");
+                fetchAndRenderCharts(branch2, startDate2, endDate2, "branch2");
+            });
+
+            function fetchAndRenderCharts(branchId, startDate, endDate, branchSuffix) {
+                
+                fetchChartData("segment-data", branchId, startDate, endDate, `Segment Bazlı Kiralamalar`, `segment-chart-${branchSuffix}`, "bar");
+
+               
+                fetchChartData("fuel-data", branchId, startDate, endDate, `Yakıt Türü`, `fuel-chart-${branchSuffix}`, "pie");
+
+               
+                fetchChartData("transmission-data", branchId, startDate, endDate, `Şanzıman Türü`, `transmission-chart-${branchSuffix}`, "pie");
+
+                
+                fetchChartData("body-type-data", branchId, startDate, endDate, `Kasa Tipi`, `body-type-chart-${branchSuffix}`, "bar");
+            }
+
+            function fetchChartData(endpoint, branchId, startDate, endDate, label, canvasId, chartType) {
+                fetch(`http://localhost:3000/${endpoint}`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ branchId, startDate, endDate }),
+                })
+                    .then((response) => response.json())
+                    .then((data) => {
+                        const chartData = formatChartData(data, label, chartType);
+                        updateChart(canvasId, chartData, chartType);
+                    })
+                    .catch((error) => console.error(`${label} verileri yüklenirken hata oluştu:`, error));
+            }
+            function formatChartData(data, label, chartType) {
+    return {
+        labels: data.map(item => item.label || "Tanımsız"),
+        datasets: [
+            {
+                label: label,
+                data: data.map(item => item.value || 0),
+                backgroundColor: chartType === "pie" 
+                    ? [
+                        'rgba(255, 99, 132, 0.4)',   
+                        'rgba(54, 162, 235, 0.4)',   
+                        'rgba(255, 206, 86, 0.4)',   
+                        'rgba(75, 192, 192, 0.4)',   
+                        'rgba(153, 102, 255, 0.4)',  
+                        'rgba(255, 159, 64, 0.4)'    
+                    ]
+                    : [
+                        'rgba(255, 99, 132, 0.4)',   
+                        'rgba(54, 162, 235, 0.4)',    
+                        'rgba(255, 206, 86, 0.4)',    
+                        'rgba(75, 192, 192, 0.4)',    
+                        'rgba(153, 102, 255, 0.4)',  
+                        'rgba(255, 159, 64, 0.4)'     
+                    ],
+                borderColor: chartType === "pie" 
+                    ? [
+                        'rgba(255, 99, 132, 1.0)',   
+                        'rgba(54, 162, 235, 1.0)',   
+                        'rgba(255, 206, 86, 1.0)',   
+                        'rgba(75, 192, 192, 1.0)',   
+                        'rgba(153, 102, 255, 1.0)',  
+                        'rgba(255, 159, 64, 1.0)'   
+                    ]
+                    : [
+                        'rgba(255, 99, 132, 1.0)',    
+                        'rgba(54, 162, 235, 1.0)',    
+                        'rgba(255, 206, 86, 1.0)',   
+                        'rgba(75, 192, 192, 1.0)',   
+                        'rgba(153, 102, 255, 1.0)',   
+                        'rgba(255, 159, 64, 1.0)'     
+                    ],
+                borderWidth: 2,
+                borderRadius: chartType === "bar" ? 5 : 0,
+                hoverBackgroundColor: chartType === "pie" 
+                    ? [
+                        'rgba(255, 99, 132, 0.8)',    
+                        'rgba(54, 162, 235, 0.8)',    
+                        'rgba(255, 206, 86, 0.8)',    
+                        'rgba(75, 192, 192, 0.8)',    
+                        'rgba(153, 102, 255, 0.8)',   
+                        'rgba(255, 159, 64, 0.8)'     
+                    ]
+                    : [
+                        'rgba(255, 99, 132, 0.8)',    
+                        'rgba(54, 162, 235, 0.8)',   
+                        'rgba(255, 206, 86, 0.8)',    
+                        'rgba(75, 192, 192, 0.8)',    
+                        'rgba(153, 102, 255, 0.8)',   
+                        'rgba(255, 159, 64, 0.8)'     
+                    ],
+            },
+        ],
+    };
+}
+
+function updateChart(canvasId, data, chartType) {
+    if (charts[canvasId]) {
+        charts[canvasId].destroy(); // Eski grafiği temizle
+    }
+    const canvas = document.getElementById(canvasId).getContext("2d");
+    charts[canvasId] = new Chart(canvas, {
+        type: chartType || "bar", 
+        data: data,
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { position: "top" },
+                tooltip: { backgroundColor: "#fff", titleColor: "#333", bodyColor: "#333" },
+            },
+            scales: {
+                x: { beginAtZero: true, grid: { color: "#eee" }, ticks: { color: "#555" } },
+                y: { beginAtZero: true, grid: { color: "#eee" }, ticks: { color: "#555" } },
+            },
+        },
+    });
+}
+
+
+        });
+    </script>
+</body>
+</html>

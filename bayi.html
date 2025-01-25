@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Şube Karar Destek Sistemi</title>
+    <link rel="stylesheet" href="styles2.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <header class="header">
+        <h1>Şube Karar Destek Sistemi</h1>
+        <button id="compare-branches" onclick="window.location.href='karsilastir.html'">ŞUBE KARŞILAŞTIR</button>
+        <div class="logout-icon" onclick="window.location.href='admin.html';">
+        <img src="log-out_10024145.png" alt="Çıkış" />
+    </div>
+    </header>
+    
+    <main class="main-content">
+     
+        <section class="filters">
+            <div class="filter-item">
+                <label for="branch">Şube Seçin:</label>
+                <select id="branch">
+                   
+                </select>
+            </div>
+            <div class="filter-item">
+                <label for="segment">Segment:</label>
+                <select id="segment">
+                    <option value="">Hepsi</option>
+                    <option value="Ekonomi">Ekonomi</option>
+                    <option value="Konfor">Konfor</option>
+                    <option value="Prestij">Prestij</option>
+                    <option value="Premium">Premium</option>
+                    <option value="Lüks">Lüks</option>
+                    <option value="Van">Van</option>
+                </select>
+            </div>
+            <div class="filter-item">
+                <label for="kasa_tipi">Kasa Tipi:</label>
+                <select id="kasa_tipi">
+                    <option value="">Hepsi</option>
+                    <option value="Sedan">Sedan</option>
+                    <option value="Hatchback">Hatchback</option>
+                    <option value="SW">SW</option>
+                    <option value="SUV">SUV</option>
+                    <option value="Van">Van</option>
+                </select>
+            </div>
+            <div class="filter-item">
+                <label for="vites">Vites:</label>
+                <select id="vites">
+                    <option value="">Hepsi</option>
+                    <option value="Manuel">Manuel</option>
+                    <option value="Otomatik">Otomatik</option>
+                </select>
+            </div>
+            <div class="filter-item">
+                <label for="yakit_tipi">Yakıt Tipi:</label>
+                <select id="yakit_tipi">
+                    <option value="">Hepsi</option>
+                    <option value="Benzin">Benzin</option>
+                    <option value="Dizel">Dizel</option>
+                    <option value="Hibrit">Hibrit</option>
+                    <option value="Elektrik">Elektrik</option>
+                </select>
+            </div>
+            <div class="filter-item">
+                <label for="start-date">Başlangıç Tarihi:</label>
+                <input type="date" id="start-date">
+            </div>
+            <div class="filter-item">
+                <label for="end-date">Bitiş Tarihi:</label>
+                <input type="date" id="end-date">
+            </div>
+            <button id="apply-filters">Filtrele</button>
+            
+            
+        </section>
+
+        
+        <section class="overview">
+            <h2>Genel Bakış</h2>
+            <div class="stats-container">
+                <div class="stat-card">
+                    <h3>Toplam Araç</h3>
+                    <p id="total-vehicles">0</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Toplam Kiralanan Gün Sayısı</h3>
+                    <p id="total-rentals">0</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Toplam Gelir</h3>
+                    <p id="monthly-income">0 TL</p>
+                </div>
+            </div>
+        </section>
+
+            <section class="charts">
+                <h2>Performans Grafikleri</h2>
+               
+                <div class="chart-container">
+                    <h3>Kiralanma Talep Grafiği</h3>
+                    <canvas id="rental-demand"></canvas>
+                </div>
+    
+                <div class="chart-row">
+                    <div class="chart-container">
+                        <h3>Segment Bazlı Kiralama Grafiği</h3>
+                        <canvas id="segment-chart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h3>Yakıt Türüne Göre Kiralama Grafiği</h3>
+                        <canvas id="fuel-chart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-row">
+                    <div class="chart-container">
+                        <h3>Şanzıman Türüne Göre Kiralama Grafiği</h3>
+                        <canvas id="transmission-chart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h3>Kasa Tipine Göre Kiralama Grafiği</h3>
+                        <canvas id="body-type-chart"></canvas>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+    <script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const branchSelect = document.getElementById("branch");
+    const rentalDemandCanvas = document.getElementById("rental-demand").getContext("2d");
+    const segmentCanvas = document.getElementById("segment-chart").getContext("2d");
+    const fuelCanvas = document.getElementById("fuel-chart").getContext("2d");
+    const transmissionCanvas = document.getElementById("transmission-chart").getContext("2d");
+    const bodyTypeCanvas = document.getElementById("body-type-chart").getContext("2d");
+
+    const filterButton = document.getElementById("apply-filters");
+
+    let rentalDemandChart = null;
+    let segmentChart = null;
+    let fuelChart = null;
+    let transmissionChart = null;
+    let bodyTypeChart = null;
+
+    fetch("http://localhost:3000/branches")
+        .then((response) => response.json())
+        .then((branches) => {
+            branches.forEach((branch) => {
+                const option = document.createElement("option");
+                option.value = branch.id;
+                option.textContent = branch.sube_adi;
+                branchSelect.appendChild(option);
+            });
+
+            if (branches.length > 0) {
+                branchSelect.value = branches[0].id;
+                loadBranchData(branches[0].id, getFilters());
+            }
+        })
+        .catch((error) => console.error("Şube bilgileri yüklenirken hata oluştu:", error));
+
+    
+    filterButton.addEventListener("click", () => {
+        const branchId = branchSelect.value;
+        loadBranchData(branchId, getFilters());
+    });
+
+   
+    function getFilters() {
+        return {
+            segment: document.getElementById("segment").value,
+            kasa_tipi: document.getElementById("kasa_tipi").value,
+            vites: document.getElementById("vites").value,
+            yakit_tipi: document.getElementById("yakit_tipi").value,
+            startDate: document.getElementById("start-date").value,
+            endDate: document.getElementById("end-date").value,
+        };
+    }
+
+    
+    function loadBranchData(branchId, filters) {
+        fetch("http://localhost:3000/filtered-data", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ branchId, filters }),
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                document.getElementById("total-vehicles").textContent = data.totalVehicles || 0;
+                document.getElementById("total-rentals").textContent = data.totalRentals || 0;
+                document.getElementById("monthly-income").textContent = `${data.monthlyIncome || 0} TL`;
+
+                rentalDemandChart = updateChart(rentalDemandChart, rentalDemandCanvas, data.rentalTrends, 'line');
+            })
+            .catch((error) => console.error("Veriler yüklenirken hata oluştu:", error));
+
+        fetch("http://localhost:3000/segment-data", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ branchId, ...filters }),
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                segmentChart = updateChart(segmentChart, segmentCanvas, formatDataForChart(data, "Segment Bazlı Kiralamalar"), 'pie');
+            })
+            .catch((error) => console.error("Segment verileri yüklenirken hata oluştu:", error));
+
+        fetch("http://localhost:3000/fuel-data", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ branchId, ...filters }),
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                fuelChart = updateChart(fuelChart, fuelCanvas, formatDataForChart(data, "Yakıt Türüne Göre Kiralamalar"), 'pie');
+            })
+            .catch((error) => console.error("Yakıt türü verileri yüklenirken hata oluştu:", error));
+
+        fetch("http://localhost:3000/transmission-data", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ branchId, ...filters }),
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                transmissionChart = updateChart(transmissionChart, transmissionCanvas, formatDataForChart(data, "Şanzıman Türüne Göre Kiralamalar"), 'pie');
+            })
+            .catch((error) => console.error("Şanzıman türü verileri yüklenirken hata oluştu:", error));
+
+        fetch("http://localhost:3000/body-type-data", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ branchId, ...filters }),
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                bodyTypeChart = updateChart(bodyTypeChart, bodyTypeCanvas, formatDataForChart(data, "Kasa Tipine Göre Kiralamalar"), 'bar');
+            })
+            .catch((error) => console.error("Kasa tipi verileri yüklenirken hata oluştu:", error));
+    }
+
+    function formatDataForChart(data, label) {
+        return {
+            labels: data.map((row) => row.label),
+            datasets: [
+                {
+                    label,
+                    data: data.map((row) => row.value),
+                    backgroundColor: getCustomColors(data.length),
+                    borderColor: getCustomColors(data.length),
+                    borderWidth: 2,
+                },
+            ],
+        };
+    }
+
+    function getCustomColors(num) {
+    const customColors = [
+        'rgba(255, 99, 132, 0.4)',  
+        'rgba(54, 162, 235, 0.4)',   
+        'rgba(255, 206, 86, 0.4)',  
+        'rgba(75, 192, 192, 0.4)',  
+        'rgba(153, 102, 255, 0.4)',  
+        'rgba(255, 159, 64, 0.4)' ,   
+    ];
+    
+    let colors = [];
+    for (let i = 0; i < num; i++) {
+        colors.push(customColors[i % customColors.length]); 
+    }
+    return colors;
+}
+
+
+
+    
+    function updateChart(chart, canvas, data, chartType = 'bar') {
+        if (chart) chart.destroy();
+        return new Chart(canvas, {
+            type: chartType, 
+            data: data,
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: "top" },
+                },
+                scales: {
+                    x: { beginAtZero: true },
+                    y: { beginAtZero: true },
+                },
+            },
+        });
+    }
+});
+
+
+    </script>
+</body>
+</html>

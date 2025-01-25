@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rent GO Admin Giriş Ekranı</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #001155;
+        }
+
+        .login-container {
+            background: #ffffff;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            width: 320px;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .login-container:hover {
+            transform: translateY(-10px); /* Hover efekti */
+        }
+
+        .login-container h2 {
+            margin-bottom: 25px;
+            font-size: 24px;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .login-container label {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 16px;
+            color: #555;
+            text-align: left;
+        }
+
+        .login-container input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            box-sizing: border-box;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .login-container input:focus {
+            border-color: #001155;
+            outline: none;
+            box-shadow: 0 0 8px rgba(42, 82, 152, 0.5);
+        }
+
+        .login-container button {
+            width: 100%;
+            padding: 15px;
+            font-size: 16px;
+            background: #001155;
+            color: white;
+            border: 2px solid #001155;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.2s ease-in-out;
+        }
+
+        .login-container button:hover {
+            background: #1d95c7;
+            transform: scale(1.05);
+        }
+
+        .login-container button:active {
+            background: #1a7bb8;
+            transform: scale(1);
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h2>Giriş Yap</h2>
+        <form id="loginForm">
+            <label for="username">Kullanıcı Adı:</label>
+            <input type="text" id="username" name="username" required>
+            <label for="password">Şifre:</label>
+            <input type="password" id="password" name="password" required>
+            <button type="submit">Giriş Yap</button>
+        </form>
+    </div>
+
+    <script src="login.js"></script>
+</body>
+</html>

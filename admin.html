@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Araç Kiralama Yönetim Paneli</title>
+    <link rel="stylesheet" href="styles.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script defer src="app.js"></script>
+</head>
+<body>
+    <div class="container">
+        
+        <div class="logout-icon" onclick="window.location.href='login.html';">
+            <img src="log-out_10024145.png" alt="Çıkış" />
+        </div>
+
+        
+        <div class="sidebar">
+            
+            <div class="logo">
+                <img src="RentGO.webp" alt="Rent GO Logo" style="width: 160px; height: auto;">
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="#" class="active">Tüm Şubeler</a></li>
+                    <li><a href="bayi.html">Şubeler</a></li>
+                    <li><a href="arac.html">Araçlar</a></li>
+                    <li><a href="login.html">Çıkış</a></li>
+                </ul>
+            </nav>
+        </div>
+
+        
+        <div class="main-content">
+          
+            <div class="cards">
+                <div id="sube-count" class="card card-orange">Şube Sayısı</div>
+                <div id="arac-count" class="card card-blue">Araç Sayısı</div>
+                
+                <div id="most-rented-bayi" class="card card-red">En Çok Kiralama Yapan Bayi</div>
+            </div>
+            
+          
+            <div class="filter-container">
+                <label for="bas-tarih">Başlangıç Tarihi:</label>
+                <input type="date" id="bas-tarih">
+                <label for="bit-tarih">Bitiş Tarihi:</label>
+                <input type="date" id="bit-tarih">
+                <button id="filter-button">Filtrele</button>
+            </div>
+
+      
+            <div class="chart-section-container">
+                <div class="chart-container">
+                    <h3>Segment Bazlı Toplam Kiralama Grafiği</h3>
+                    <canvas id="segment-chart"></canvas>
+                </div>
+
+                <div class="chart-container">
+                    <h3>Yakıt Türüne Göre Kiralama Grafiği</h3>
+                    <canvas id="yakit-chart"></canvas>
+                </div>
+
+                <div class="chart-container">
+                    <h3>Şanzıman Türüne Göre Kiralama Grafiği</h3>
+                    <canvas id="sanziman-chart"></canvas>
+                </div>
+
+                <div class="chart-container">
+                    <h3>Şube Türüne Göre Dağılım</h3>
+                    <canvas id="sube-chart"></canvas>
+                </div>
+
+                <div class="chart-container">
+                    <h3>Kasa Tipine Göre Kiralama Grafiği</h3>
+                    <canvas id="kasa-chart"></canvas>
+                </div>
+
+                <div class="chart-container">
+                    <h3>Bölgeye Göre Kiralama Sayıları</h3>
+                    <canvas id="bolge-chart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
