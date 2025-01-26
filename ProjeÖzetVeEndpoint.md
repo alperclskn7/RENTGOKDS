@@ -15,11 +15,12 @@ yönetici,şubelerdeki kiralama eğilimlerini ve performans farklarını görsel
 analiz edebilmekte ve kararlarını bu verilere dayanarak alabilmektedir.
 
 Endpointler:
-GET /data: Verileri almak için kullanılıyor.
-GET /branches: Şubelerle ilgili bilgileri almak için kullanılıyor.
-POST /filtered-data: Belirli filtrelerle veri almak için.
-POST /filtered-vehicle-data: Araçlara yönelik filtrelenmiş veri almak için.
-POST /segment-data: Segmentlere dair veri almak için.
-POST /fuel-data: Yakıt türlerine dair veri almak için.
-POST /transmission-data: Şanzıman bilgileri almak için.
-POST /body-type-data: Araç gövde tipi bilgilerini almak için.
+1.GET /data: Verileri almak için kullanılıyor.
+2.GET /branches: Şubelerle ilgili bilgileri almak için kullanılıyor.
+3.POST /filtered-data: Belirli filtrelerle veri almak için.
+4.POST /filtered-vehicle-data: Araçlara yönelik filtrelenmiş veri almak için.
+5.POST /segment-data: Segmentlere dair veri almak için.
+6.POST /fuel-data: Yakıt türlerine dair veri almak için.
+7.POST /transmission-data: Şanzıman bilgileri almak için.
+8.POST /body-type-data: Araç gövde tipi bilgilerini almak için.
+9.POST /login::Kullanıcı giriş işlemini gerçekleştirir. İstek gövdesinde (request body) gönderilen kullanıcı adı ve şifre bilgilerini doğrular.
